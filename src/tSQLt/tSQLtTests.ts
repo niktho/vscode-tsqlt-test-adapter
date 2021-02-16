@@ -104,8 +104,7 @@ export class tSQLtTestRunner {
         node: TestSuiteInfo | TestInfo,
     ): Promise<void> {
         var query = `
-        exec [tSQLt].[Run] '${node.id}', 'tSQLt.XmlResultFormatter';
-        WAITFOR DELAY '00:00:01';
+        exec [tSQLt].[Run] '${node.id}', 'tSQLt.XmlResultFormatter';        
         `;
 
         if (node.type === 'suite') {
