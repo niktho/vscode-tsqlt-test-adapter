@@ -2,11 +2,16 @@
   "name": "vscode-tsqlt-test-adapter",
   "displayName": "vscode-tsqlt-test-adapter",
   "description": "Run your tSQLt tests in the sidebar of Visual Studio Code",
+  "publisher": "NikolaiThomassen",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niktho/vscode-tsqlt-test-adapter.git"
+  },
   "icon": "images/icon.png",
   "version": "0.0.1",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.23.0"
+    "vscode": "^1.52.1"
   },
   "categories": [
     "Other"
@@ -53,7 +58,7 @@
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.4",
     "@types/node": "^12.11.7",
-    "@types/vscode": "^1.53.0",
+    "@types/vscode": "^1.52.1",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
     "eslint": "^7.19.0",
