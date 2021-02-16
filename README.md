@@ -68,7 +68,7 @@ This is an early release of the extension. Issues can be reported [here]()
 
 Users appreciate release notes as you update your extension.
 
-### 0.1.0-alpha
+### 0.1.0
 
 Initial release of the extension to the public. 
 
