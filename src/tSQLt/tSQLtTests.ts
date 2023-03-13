@@ -76,14 +76,10 @@ export class tSQLtTestRunner {
             result['value'],
             { explicitArray: false, explicitRoot: false, mergeAttrs: true },
             (err, result) => {
-                if (err) {
-                    this.fireTestEvent(nodeId, 'errored', err.message);
+                if (result?.testsuite.failures > 0) {
+                    this.fireTestEvent(nodeId, 'failed', result.testsuite.testcase.failure.message);
                 } else {
-                    if (result.testsuite.failures > 0) {
-                        this.fireTestEvent(nodeId, 'failed', result.testsuite.testcase.failure.message);
-                    } else {
-                        this.fireTestEvent(nodeId, 'passed');
-                    }
+                    this.fireTestEvent(nodeId, 'passed');
                 }
             });
     }
@@ -104,7 +100,7 @@ export class tSQLtTestRunner {
         node: TestSuiteInfo | TestInfo,
     ): Promise<void> {
         var query = `
-        exec [tSQLt].[Run] '${node.id}', 'tSQLt.XmlResultFormatter';        
+        EXEC [tSQLt].[Run] '${node.id}', 'tSQLt.XmlResultFormatter';
         `;
 
         if (node.type === 'suite') {
@@ -134,12 +130,12 @@ export class tSQLtTestRunner {
     private async getTestCasesForTestClass(schemaId: number): Promise<TestInfo[]> {
         var testInfos: TestInfo[] = [];
         var query = `
-        SELECT 
-            [SchemaId], 
-            [TestClassName], 
-            [ObjectId], 
-            [Name] 
-        FROM [tSQLt].[Tests] 
+        SELECT
+            [SchemaId],
+            [TestClassName],
+            [ObjectId],
+            [Name]
+        FROM [tSQLt].[Tests]
         WHERE [SchemaId] = ${schemaId};
         `;
 
@@ -163,9 +159,9 @@ export class tSQLtTestRunner {
     private async getTestClasses(): Promise<TestSuiteInfo[]> {
         var testSuites: TestSuiteInfo[] = [];
         var query = `
-        SELECT 
-            [Name], 
-            [SchemaId] 
+        SELECT
+            [Name],
+            [SchemaId]
         FROM [tSQLt].[TestClasses];
         `;
 
