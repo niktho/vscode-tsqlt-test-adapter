@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+var cliTable = require('cli-table');
 
 //test-explorer
 import { TestSuiteInfo, TestInfo, TestRunStartedEvent, TestRunFinishedEvent, TestSuiteEvent, TestEvent } from 'vscode-test-adapter-api';
@@ -45,26 +46,39 @@ export class tSQLtTestRunner {
     private formatMessage(
         nodeId: string,
         state: 'running' | 'passed' | 'completed' | 'failed' | 'errored',
+        timeInSeconds? : string,
         message?: string): string | undefined {
 
         if (state === 'running') {
             return undefined;
         }
 
-        const testHeader = `+${"-".repeat(24)}+\n| Test execution summary |\n+${"-".repeat(24)}+`;
-        const testCase = `Test case:\n    ${nodeId}`;
-        const testState = `State:\n    ${state.toUpperCase()}`;
-        const testMessage = `Message:\n    ${message ? message : ''}`;
-        return `${testHeader}\n\n${testCase}\n${testState}\n${testMessage}`;
+        const timeInMilliseconds = timeInSeconds ? parseFloat(timeInSeconds) * 1000 : '';
+
+        const testHeaderTable = new cliTable({head: ['Test Execution Summary']});
+
+        const testCaseResultsTable = new cliTable({ head: ['Test Case Name', 'Dur (ms)', 'State']});
+
+        const testCase = `${nodeId}`;
+        const testState = `${state.toUpperCase()}`;
+        testCaseResultsTable.push([testCase, timeInMilliseconds.toString(), testState]);
+
+        var output = `${testHeaderTable.toString()}\n${testCaseResultsTable.toString()}`;
+
+        const testMessage = `Message:\n    ${message}`;
+        if (message) {output += `\n${testMessage}`;};
+
+        return output;
     }
 
     private fireTestEvent(
         nodeId: string,
         state: 'running' | 'passed' | 'completed' | 'failed' | 'errored',
+        timeInSeconds?: string,
         message?: string
     ): void {
         this.testStatesEmitter.fire(
-            <TestEvent>{ type: 'test', test: nodeId, state: state, message: this.formatMessage(nodeId, state, message) });
+            <TestEvent>{ type: 'test', test: nodeId, state: state, message: this.formatMessage(nodeId, state, timeInSeconds, message) });
     }
 
     private handleTestResult(result: tSQLtResult, nodeId: string): void {
@@ -77,9 +91,12 @@ export class tSQLtTestRunner {
             { explicitArray: false, explicitRoot: false, mergeAttrs: true },
             (err, result) => {
                 if (result?.testsuite.failures > 0) {
-                    this.fireTestEvent(nodeId, 'failed', result.testsuite.testcase.failure.message);
-                } else {
-                    this.fireTestEvent(nodeId, 'passed');
+                    this.fireTestEvent(nodeId, 'failed', result.testsuite.testcase.time, result.testsuite.testcase.failure.message);
+                } else if (result?.testsuite.errors > 0) {
+                    this.fireTestEvent(nodeId, 'errored', result.testsuite.testcase.time, result.testsuite.testcase.error.message);
+                }
+                else {
+                    this.fireTestEvent(nodeId, 'passed', result.testsuite.testcase.time);
                 }
             });
     }
@@ -117,12 +134,11 @@ export class tSQLtTestRunner {
 
             await executeSql<tSQLtResult>(query, this.getConnectionInformation())
                 .then(response => {
-                    if (response && response.length > 0) {
-                        this.handleTestResult(response[0], node.id);
-                    }
+                    const testsuitesIndex = response.findIndex(r => r.value.includes('<testsuites>'));
+                    this.handleTestResult(response[testsuitesIndex], node.id);
                 })
                 .catch(error => {
-                    this.fireTestEvent(node.id, 'errored', error);
+                    this.fireTestEvent(node.id, 'errored', undefined, error);
                 });
         }
     }

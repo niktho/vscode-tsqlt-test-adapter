@@ -69,5 +69,6 @@ This is an early release of the extension. Issues can be reported [here]()
 ### 0.1.0
 Initial release of the extension to the public.
 ### 0.1.1
-Bug fix related to stored procedures being tested that string data that cannot be parsed as XML test output.
+Bug fix: For stored procedures that output data, fix the parser so that the tSQLt result information is what is parsed for test results.
+New: The test execution summary is now in table format. It also includes the Duration (ms) of the executed test. This looks similar to the output when running a tSQLt test directly in SSMS.
 
