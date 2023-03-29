@@ -8,7 +8,7 @@
     "url": "https://github.com/niktho/vscode-tsqlt-test-adapter.git"
   },
   "icon": "images/icon.png",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "preview": true,
   "license": "MIT",
   "engines": {
@@ -49,6 +49,7 @@
   "dependencies": {
     "@types/tedious": "^4.0.3",
     "@types/xml2js": "0.4.8",
+    "cli-table": "^0.3.11",
     "tedious": "^11.0.1",
     "tslib": "^1.9.3",
     "vscode-test-adapter-api": "^1.7.0",
